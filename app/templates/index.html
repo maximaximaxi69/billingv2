@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="lv" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NC Invoice Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="h-full bg-gradient-to-b from-[#0b132b] via-[#0e1d3b] to-[#0b1f47] text-slate-100">
+  <header class="border-b border-slate-700/60 bg-[#0f1b36]/95 backdrop-blur">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center font-bold">NC</div>
+        <div class="text-2xl font-semibold text-indigo-300">Invoice Manager</div>
+      </div>
+      <nav class="flex items-center gap-2 text-sm" id="top-menu">
+        <button data-tab="tab-invoices" class="menu-item px-3 py-2 rounded-md bg-indigo-600/30 border border-indigo-400/50">Rēķini</button>
+        <button data-tab="tab-clients" class="menu-item px-3 py-2 rounded-md hover:bg-slate-700/50">Klienti</button>
+        <button data-tab="tab-services" class="menu-item px-3 py-2 rounded-md hover:bg-slate-700/50">Pakalpojumi</button>
+        <button data-tab="tab-backup" class="menu-item px-3 py-2 rounded-md hover:bg-slate-700/50">Rezerves kopija</button>
+        <button data-tab="tab-settings" class="menu-item px-3 py-2 rounded-md hover:bg-slate-700/50">Iestatījumi</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <section id="tab-invoices" class="tab-panel space-y-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-4xl font-bold">Rēķini</h1>
+        <div class="flex gap-2">
+          <button id="open-invoice-form" class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded-lg">+ Jauns rēķins</button>
+        </div>
+      </div>
+
+      <div id="invoice-form-card" class="hidden bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">
+        <h2 class="text-xl font-semibold mb-3">Jauns rēķins</h2>
+        <form id="invoice-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="number" placeholder="Rēķina numurs" required />
+          <select class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="invoice_type" id="invoice_type">
+            <option value="regular">Parasts rēķins</option>
+            <option value="advance">Avansa rēķins</option>
+            <option value="advance_final">Avansa gala rēķins</option>
+          </select>
+          <select class="bg-slate-900/70 border border-slate-600 p-2 rounded" id="issuer_party_id" name="issuer_party_id"><option value="">Piestādītājs</option></select>
+          <select class="bg-slate-900/70 border border-slate-600 p-2 rounded" id="client_party_id" name="client_party_id"><option value="">Klients</option></select>
+          <textarea class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="seller_details" placeholder="Pārdevēja rekvizīti"></textarea>
+          <textarea class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="client_details" placeholder="Klienta rekvizīti"></textarea>
+          <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" type="date" name="issue_date" required />
+          <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" type="date" name="due_date" required />
+          <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="seller_name" placeholder="Izsniedzējs" required />
+          <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="client_name" placeholder="Pircējs" required />
+          <textarea class="bg-slate-900/70 border border-slate-600 p-2 rounded md:col-span-2" name="notes" placeholder="Piezīmes"></textarea>
+          <div id="advance-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-3">
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="previous_paid_amount" type="number" step="0.01" placeholder="Iepriekš samaksāts" />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="previous_advance_reference" placeholder="Avansa rēķina atsauce" />
+          </div>
+          <div class="md:col-span-2 grid md:grid-cols-4 gap-2">
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_description" placeholder="Apraksts" required />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_quantity" type="number" step="0.01" value="1" required />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_unit" value="gab" required />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_price" type="number" step="0.01" required />
+          </div>
+          <button class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded md:col-span-2">Saglabāt rēķinu</button>
+        </form>
+      </div>
+
+      <div class="bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">
+        <div class="grid md:grid-cols-3 gap-2 mb-3">
+          <input id="search-q" class="bg-slate-900/70 border border-slate-600 p-2 rounded" placeholder="Meklēt pēc numura/klienta" />
+          <select id="filter-type" class="bg-slate-900/70 border border-slate-600 p-2 rounded">
+            <option value="">Visi tipi</option><option value="regular">Parastie</option><option value="advance">Avansa</option><option value="advance_final">Avansa gala</option>
+          </select>
+          <select id="sort-by" class="bg-slate-900/70 border border-slate-600 p-2 rounded">
+            <option value="issue_date_desc">Datums ↓</option><option value="issue_date_asc">Datums ↑</option><option value="amount_desc">Summa ↓</option><option value="amount_asc">Summa ↑</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-7 text-xs uppercase tracking-wider bg-slate-700/40 rounded-t-lg p-3 text-slate-300">
+          <div>Nr.</div><div>Klients</div><div>Datums</div><div>Termiņš</div><div>Summa</div><div>Apmaksāts</div><div>Darbības</div>
+        </div>
+        <div id="invoice-list" class="border border-slate-700 border-t-0 rounded-b-lg"></div>
+      </div>
+    </section>
+
+    <section id="tab-clients" class="tab-panel hidden space-y-4">
+      <h1 class="text-3xl font-bold">Klienti un profili</h1>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">
+          <h2 class="text-lg font-semibold mb-2">Jauns klients</h2>
+          <form id="client-form" class="grid gap-2">
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="name" placeholder="Nosaukums" required />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="reg_no" placeholder="Reģ. Nr." />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="vat_no" placeholder="PVN Nr." />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="legal_address" placeholder="Juridiskā adrese" />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="bank_name" placeholder="Banka" />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="bank_account" placeholder="Konts" />
+            <button class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded">Saglabāt klientu</button>
+          </form>
+        </div>
+        <div class="bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">
+          <h2 class="text-lg font-semibold mb-2">Jauns piestādītājs</h2>
+          <form id="issuer-form" class="grid gap-2">
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="name" placeholder="Nosaukums" required />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="reg_no" placeholder="Reģ. Nr." />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="vat_no" placeholder="PVN Nr." />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="legal_address" placeholder="Juridiskā adrese" />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="bank_name" placeholder="Banka" />
+            <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="bank_account" placeholder="Konts" />
+            <button class="bg-indigo-500 hover:bg-indigo-400 px-4 py-2 rounded">Saglabāt profilu</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-services" class="tab-panel hidden bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">Pakalpojumu sadaļa (drīzumā).</section>
+
+    <section id="tab-backup" class="tab-panel hidden bg-[#14284e]/85 border border-slate-700 rounded-xl p-4">
+      <h2 class="text-xl font-semibold mb-2">Pavadzīmes</h2>
+      <form id="note-form" class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="number" placeholder="Pavadzīmes numurs" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" type="date" name="issue_date" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="issuer_name" placeholder="Izsniedzējs" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="receiver_name" placeholder="Saņēmējs" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded md:col-span-2" name="delivery_address" placeholder="Piegādes adrese" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_description" placeholder="Apraksts" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_quantity" type="number" step="0.01" value="1" required />
+        <input class="bg-slate-900/70 border border-slate-600 p-2 rounded" name="item_unit" value="gab" required />
+        <button class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded md:col-span-2">Saglabāt pavadzīmi</button>
+      </form>
+      <div id="note-list" class="space-y-2"></div>
+    </section>
+
+    <section id="tab-settings" class="tab-panel hidden bg-[#14284e]/85 border border-slate-700 rounded-xl p-4 space-y-2">
+      <h2 class="text-xl font-semibold">Iestatījumi</h2>
+      <p>App URL: <b>http://127.0.0.1:8000</b></p>
+      <p>Datu bāze: <b>nc_invoice_manager.db</b></p>
+      <p>Palaidiet `run.bat` vai `NCInvoiceManager.exe` no izpakotā ZIP.</p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
