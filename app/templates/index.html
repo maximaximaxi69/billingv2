@@ -137,6 +137,139 @@
       <p>Palaidiet `run.bat` vai `NCInvoiceManager.exe` no izpakotā ZIP.</p>
     </section>
   </main>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="h-full bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+  <div class="max-w-7xl mx-auto p-6 space-y-6">
+    <header class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold flex items-center gap-2"><i data-lucide="receipt"></i> NC Invoice Manager</h1>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Rēķini, avansa rēķini, gala rēķini un pavadzīmes vienuviet.</p>
+      </div>
+      <button id="theme-toggle" class="border dark:border-slate-700 px-3 py-2 rounded-lg flex items-center gap-2">
+        <i data-lucide="moon"></i> Dark mode
+      </button>
+    </header>
+
+    <section class="grid lg:grid-cols-2 gap-4">
+      <div class="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-3">
+        <h2 class="font-semibold text-xl flex items-center gap-2"><i data-lucide="users"></i> Saglabātie klienti</h2>
+        <form id="client-form" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="name" placeholder="Uzņēmuma nosaukums" required />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="reg_no" placeholder="Reģ. Nr." />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="vat_no" placeholder="PVN Nr." />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="legal_address" placeholder="Juridiskā adrese" />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="bank_name" placeholder="Banka" />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="bank_account" placeholder="Bankas konts" />
+          <button class="bg-indigo-600 text-white px-4 py-2 rounded md:col-span-2">Saglabāt klientu</button>
+        </form>
+      </div>
+      <div class="bg-white dark:bg-slate-900 rounded-xl shadow p-4 space-y-3">
+        <h2 class="font-semibold text-xl flex items-center gap-2"><i data-lucide="briefcase"></i> Rēķina piestādītāja profili</h2>
+        <form id="issuer-form" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="name" placeholder="Uzņēmuma nosaukums" required />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="reg_no" placeholder="Reģ. Nr." />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="vat_no" placeholder="PVN Nr." />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="legal_address" placeholder="Juridiskā adrese" />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="bank_name" placeholder="Banka" />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="bank_account" placeholder="Bankas konts" />
+          <button class="bg-indigo-600 text-white px-4 py-2 rounded md:col-span-2">Saglabāt profilu</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-900 rounded-xl shadow p-4">
+      <h2 class="font-semibold text-xl mb-3 flex items-center gap-2"><i data-lucide="file-plus-2"></i> Jauns rēķins</h2>
+      <form id="invoice-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="number" placeholder="Rēķina numurs" required />
+        <select class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="invoice_type" id="invoice_type">
+          <option value="regular">Parasts rēķins</option>
+          <option value="advance">Avansa rēķins</option>
+          <option value="advance_final">Avansa gala rēķins</option>
+        </select>
+
+        <select class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" id="issuer_party_id" name="issuer_party_id">
+          <option value="">Izvēlies piestādītāja profilu</option>
+        </select>
+        <select class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" id="client_party_id" name="client_party_id">
+          <option value="">Izvēlies klientu</option>
+        </select>
+
+        <textarea class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="seller_details" placeholder="Pārdevēja rekvizīti (auto aizpilde no profila)"></textarea>
+        <textarea class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="client_details" placeholder="Klienta rekvizīti (auto aizpilde no klienta)"></textarea>
+
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" type="date" name="issue_date" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" type="date" name="due_date" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="seller_name" placeholder="Izsniedzējs / Pārdevējs" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="client_name" placeholder="Klients / Pircējs" required />
+        <textarea class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded md:col-span-2" name="notes" placeholder="Piezīmes"></textarea>
+
+        <div id="advance-fields" class="hidden md:col-span-2 grid md:grid-cols-2 gap-3">
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="previous_paid_amount" type="number" step="0.01" placeholder="Iepriekš samaksātā summa" />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="previous_advance_reference" placeholder="Avansa rēķina atsauce" />
+        </div>
+
+        <div class="md:col-span-2 border dark:border-slate-700 rounded p-3">
+          <p class="font-medium mb-2">Rinda</p>
+          <div class="grid md:grid-cols-4 gap-2">
+            <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_description" placeholder="Apraksts" required />
+            <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_quantity" type="number" step="0.01" value="1" required />
+            <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_unit" value="gab" required />
+            <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_price" type="number" step="0.01" required />
+          </div>
+        </div>
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded md:col-span-2 flex items-center justify-center gap-2"><i data-lucide="save"></i> Saglabāt rēķinu</button>
+      </form>
+    </section>
+
+    <section class="bg-white dark:bg-slate-900 rounded-xl shadow p-4">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+        <h2 class="font-semibold text-xl flex items-center gap-2"><i data-lucide="list-filter"></i> Rēķinu saraksts</h2>
+        <div class="grid md:grid-cols-3 gap-2">
+          <input id="search-q" class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" placeholder="Meklēt pēc numura/klienta" />
+          <select id="filter-type" class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded">
+            <option value="">Visi tipi</option>
+            <option value="regular">Parastie</option>
+            <option value="advance">Avansa</option>
+            <option value="advance_final">Avansa gala</option>
+          </select>
+          <select id="sort-by" class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded">
+            <option value="issue_date_desc">Datums ↓</option>
+            <option value="issue_date_asc">Datums ↑</option>
+            <option value="amount_desc">Summa ↓</option>
+            <option value="amount_asc">Summa ↑</option>
+          </select>
+        </div>
+      </div>
+      <div id="invoice-list" class="space-y-2"></div>
+    </section>
+
+    <section class="bg-white dark:bg-slate-900 rounded-xl shadow p-4">
+      <h2 class="font-semibold text-xl mb-3 flex items-center gap-2"><i data-lucide="truck"></i> Jauna pavadzīme</h2>
+      <form id="note-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="number" placeholder="Pavadzīmes numurs" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" type="date" name="issue_date" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="issuer_name" placeholder="Izsniedzēja vārds" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="receiver_name" placeholder="Saņēmēja vārds uzvārds" required />
+        <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded md:col-span-2" name="delivery_address" placeholder="Piegādes adrese" required />
+        <div class="md:col-span-2 border dark:border-slate-700 rounded p-3 grid md:grid-cols-3 gap-2">
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_description" placeholder="Preces/pakalpojuma apraksts" required />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_quantity" type="number" step="0.01" value="1" required />
+          <input class="border dark:border-slate-700 dark:bg-slate-800 p-2 rounded" name="item_unit" value="gab" required />
+        </div>
+        <button class="bg-emerald-600 text-white px-4 py-2 rounded md:col-span-2 flex items-center justify-center gap-2"><i data-lucide="save"></i> Saglabāt pavadzīmi</button>
+      </form>
+    </section>
+
+    <section class="bg-white dark:bg-slate-900 rounded-xl shadow p-4">
+      <h2 class="font-semibold text-xl mb-3">Pavadzīmes</h2>
+      <div id="note-list" class="space-y-2"></div>
+    </section>
+  </div>
 
   <script src="/static/app.js"></script>
 </body>
