@@ -12,6 +12,10 @@ def get_runtime_dir() -> Path:
 
 DB_PATH = get_runtime_dir() / "nc_invoice_manager.db"
 DATABASE_URL = f"sqlite:///{DB_PATH}"
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+DATABASE_URL = "sqlite:///./nc_invoice_manager.db"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
