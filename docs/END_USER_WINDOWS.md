@@ -1,5 +1,15 @@
 # NC Invoice Manager — Windows lietotāja instrukcija
 
+## Ātrākais ceļš
+1. No GitHub Releases lejupielādē `NCInvoiceManager-windows.zip`.
+2. Izpako jebkurā mapē.
+3. Palaid `NCInvoiceManager.exe`.
+4. Sagaidi CMD logā ziņu, ka serveris gatavs.
+5. Pārlūks atvērsies automātiski uz `http://127.0.0.1:8000`.
+
+## Ja Releases vēl nav
+- Dodies uz **Actions** un lejupielādē artifact `NCInvoiceManager-windows` no workflow `Build Windows ZIP`.
+
 ## Ko darīt
 1. Lejupielādē `NCInvoiceManager-windows.zip`.
 2. Izpako jebkurā mapē.
