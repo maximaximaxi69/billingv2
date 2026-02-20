@@ -1,0 +1,31 @@
+name: Build Windows ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build distributable ZIP
+        shell: cmd
+        run: scripts\build_windows_zip.bat
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NCInvoiceManager-windows
+          path: dist/NCInvoiceManager-windows.zip
+          if-no-files-found: error
