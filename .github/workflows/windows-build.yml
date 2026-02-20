@@ -19,6 +19,10 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Syntax check
+        shell: cmd
+        run: py -3 -m py_compile scripts\build_windows_zip.py packaging\windows_entry.py app\*.py
+
       - name: Build distributable ZIP
         shell: cmd
         run: scripts\build_windows_zip.bat
