@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST_DIR = ROOT / "dist"
+BUILD_DIR = ROOT / "build"
 PACKAGE_DIR = DIST_DIR / "NCInvoiceManager-windows"
 ZIP_PATH = DIST_DIR / "NCInvoiceManager-windows.zip"
 
@@ -20,7 +21,15 @@ def main():
 
     DIST_DIR.mkdir(exist_ok=True)
 
-    run([sys.executable, "-m", "pip", "install", "-r", str(ROOT / "requirements.txt"), "pyinstaller"])
+    run([
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        str(ROOT / "requirements.txt"),
+        "pyinstaller",
+    ])
 
     run([
         sys.executable,
@@ -28,7 +37,6 @@ def main():
         "PyInstaller",
         "--noconfirm",
         "--clean",
-        "--onefile",
         "--name",
         "NCInvoiceManager",
         "--add-data",
@@ -39,6 +47,8 @@ def main():
         "reportlab",
         "--collect-all",
         "jinja2",
+        "--collect-all",
+        "starlette",
         str(ROOT / "packaging" / "windows_entry.py"),
     ])
 
@@ -46,25 +56,25 @@ def main():
         shutil.rmtree(PACKAGE_DIR)
     PACKAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    exe_src = DIST_DIR / "NCInvoiceManager.exe"
+    exe_src = DIST_DIR / "NCInvoiceManager" / "NCInvoiceManager.exe"
     shutil.copy2(exe_src, PACKAGE_DIR / "NCInvoiceManager.exe")
 
-    (PACKAGE_DIR / "run.bat").write_text(
+    run_bat = PACKAGE_DIR / "run.bat"
+    run_bat.write_text(
         "@echo off\n"
         "cd /d %~dp0\n"
-        "title Invoice Manager\n"
-        "echo Starting Invoice Manager...\n"
+        "echo Starting NC Invoice Manager on http://127.0.0.1:8000\n"
         "NCInvoiceManager.exe\n",
         encoding="utf-8",
     )
 
-    (PACKAGE_DIR / "README-WINDOWS.txt").write_text(
+    notes_txt = PACKAGE_DIR / "README-WINDOWS.txt"
+    notes_txt.write_text(
         "NC Invoice Manager (Windows)\n"
         "===========================\n\n"
-        "1) Double click run.bat (or NCInvoiceManager.exe).\n"
-        "2) A terminal opens with status info.\n"
-        "3) Browser opens automatically on http://127.0.0.1:8000\n"
-        "4) Data is stored in nc_invoice_manager.db in this folder.\n",
+        "1) Double click run.bat\n"
+        "2) Open browser: http://127.0.0.1:8000\n"
+        "3) Data is stored in nc_invoice_manager.db in this folder.\n",
         encoding="utf-8",
     )
 

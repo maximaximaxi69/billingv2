@@ -12,11 +12,24 @@ const sortBy = document.getElementById('sort-by');
 const searchQ = document.getElementById('search-q');
 const issuerPartySelect = document.getElementById('issuer_party_id');
 const clientPartySelect = document.getElementById('client_party_id');
-const openInvoiceFormBtn = document.getElementById('open-invoice-form');
-const invoiceFormCard = document.getElementById('invoice-form-card');
+const themeToggle = document.getElementById('theme-toggle');
 
 let clients = [];
 let issuers = [];
+
+function renderIcons() {
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+  localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+}
+
+function hydrateTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') document.documentElement.classList.add('dark');
+}
 
 function updateAdvanceFields() {
   advanceFields.classList.toggle('hidden', typeSelect.value !== 'advance_final');
@@ -30,6 +43,8 @@ function fmtParty(p) {
     p.legal_address ? `Adrese: ${p.legal_address}` : null,
     p.bank_name ? `Banka: ${p.bank_name}` : null,
     p.bank_account ? `Konts: ${p.bank_account}` : null,
+    p.email ? `E-pasts: ${p.email}` : null,
+    p.phone ? `Tālr.: ${p.phone}` : null,
   ].filter(Boolean).join('\n');
 }
 
@@ -57,6 +72,9 @@ clientPartySelect.addEventListener('change', () => {
   invoiceForm.client_name.value = party.name;
   invoiceForm.client_details.value = fmtParty(party);
 });
+
+typeSelect.addEventListener('change', updateAdvanceFields);
+themeToggle.addEventListener('click', toggleTheme);
 
 clientForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -110,10 +128,12 @@ invoiceForm.addEventListener('submit', async (e) => {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload),
   });
-  if (!res.ok) return alert('Kļūda, saglabājot rēķinu');
+  if (!res.ok) {
+    alert('Kļūda, saglabājot rēķinu');
+    return;
+  }
   invoiceForm.reset();
   updateAdvanceFields();
-  invoiceFormCard.classList.add('hidden');
   await loadInvoices();
 });
 
@@ -138,7 +158,10 @@ noteForm.addEventListener('submit', async (e) => {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(payload),
   });
-  if (!res.ok) return alert('Kļūda, saglabājot pavadzīmi');
+  if (!res.ok) {
+    alert('Kļūda, saglabājot pavadzīmi');
+    return;
+  }
   noteForm.reset();
   await loadNotes();
 });
@@ -150,63 +173,41 @@ async function loadInvoices() {
   if (sortBy.value) p.set('sort', sortBy.value);
 
   const data = await fetch(`/api/invoices?${p.toString()}`).then(r => r.json());
-  if (!data.length) {
-    invoiceList.innerHTML = `<div class="p-6 text-center text-slate-400">Nav rēķinu. Nospiediet “+ Jauns rēķins”, lai izveidotu.</div>`;
-    return;
-  }
-
   invoiceList.innerHTML = data.map(i => `
-    <div class="grid grid-cols-7 items-center p-3 border-t border-slate-700 text-sm">
-      <div>${i.number}</div>
-      <div>${i.client_name}</div>
-      <div>${i.issue_date}</div>
-      <div>${i.due_date}</div>
-      <div>${i.total.toFixed(2)} EUR</div>
-      <div>${i.payable.toFixed(2)} EUR</div>
-      <div><a class="text-indigo-300 underline" href="/api/invoices/${i.id}/pdf">PDF</a></div>
+    <div class="border dark:border-slate-700 rounded-lg p-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800/40">
+      <div>
+        <p class="font-semibold">${i.number} · <span class="uppercase text-xs tracking-wide">${i.invoice_type}</span></p>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Izrakstīts: ${i.issue_date} · Termiņš: ${i.due_date}</p>
+        <p class="text-sm text-slate-700 dark:text-slate-200">Klients: ${i.client_name} · Izsniedzējs: ${i.seller_name}</p>
+        <p class="text-sm"><b>Kopā:</b> ${i.total} EUR · <b>Apmaksājams:</b> ${i.payable} EUR</p>
+      </div>
+      <a class="text-blue-600 underline flex items-center gap-1" href="/api/invoices/${i.id}/pdf"><i data-lucide="download"></i> PDF</a>
     </div>
   `).join('');
+  renderIcons();
 }
 
 async function loadNotes() {
   const data = await fetch('/api/delivery-notes').then(r => r.json());
   noteList.innerHTML = data.map(n => `
-    <div class="border border-slate-700 rounded p-2 flex items-center justify-between">
-      <span>${n.number} · ${n.issue_date} · ${n.receiver_name}</span>
-      <a class="text-indigo-300 underline" href="/api/delivery-notes/${n.id}/pdf">PDF</a>
+    <div class="border dark:border-slate-700 rounded p-2 flex items-center justify-between">
+      <div>
+        <p class="font-medium">${n.number}</p>
+        <p class="text-sm text-slate-600 dark:text-slate-300">${n.issue_date} · ${n.receiver_name}</p>
+      </div>
+      <a class="text-blue-600 underline flex items-center gap-1" href="/api/delivery-notes/${n.id}/pdf"><i data-lucide="download"></i> PDF</a>
     </div>
   `).join('');
+  renderIcons();
 }
 
-function setupMenuTabs() {
-  const buttons = Array.from(document.querySelectorAll('.menu-item'));
-  const tabs = Array.from(document.querySelectorAll('.tab-panel'));
-
-  function activate(tabId) {
-    tabs.forEach(t => t.classList.toggle('hidden', t.id !== tabId));
-    buttons.forEach(b => {
-      const active = b.dataset.tab === tabId;
-      b.classList.toggle('bg-indigo-600/30', active);
-      b.classList.toggle('border', active);
-      b.classList.toggle('border-indigo-400/50', active);
-    });
-  }
-
-  buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.tab)));
-  activate('tab-invoices');
-}
-
-openInvoiceFormBtn.addEventListener('click', () => {
-  invoiceFormCard.classList.toggle('hidden');
-});
-
-typeSelect.addEventListener('change', updateAdvanceFields);
 filterType.addEventListener('change', loadInvoices);
 sortBy.addEventListener('change', loadInvoices);
 searchQ.addEventListener('input', loadInvoices);
 
-setupMenuTabs();
+hydrateTheme();
 updateAdvanceFields();
 loadParties();
 loadInvoices();
 loadNotes();
+renderIcons();
